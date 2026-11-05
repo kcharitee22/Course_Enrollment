@@ -152,3 +152,59 @@ export const loginUser = async (req, res, next) => {
     });
   }
 };
+
+// ==================== Logout ======================
+
+export const logoutUser = (req, res, next) => {
+  req.session.destroy((error) => {
+    if (error) {
+      return next(error);
+    }
+
+    res.clearCookie("classEnroll.sid", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
+
+    return res.status(200).json({
+      message: "Logout successful.",
+    });
+  });
+};
+
+// ============= current user point ==============
+
+export const getCurrentUser = async (req, res) => {
+  try {
+    // 1. Check whether a user is logged in
+    if (!req.session.userId) {
+      return res.status(401).json({
+        message: "You are not logged in.",
+      });
+    }
+
+    // 2. Find the logged-in user
+    const user = await User.findById(req.session.userId)
+      .select("-password");
+
+    // 3. Check whether the account still exists
+    if (!user) {
+      return res.status(401).json({
+        message: "User account not found.",
+      });
+    }
+
+    // 4. Return the user information
+    return res.status(200).json({
+      message: "User authenticated successfully.",
+      user,
+    });
+  } catch (error) {
+    console.error("Current user error:", error);
+
+    return res.status(500).json({
+      message: "Unable to retrieve user information.",
+    });
+  }
+};

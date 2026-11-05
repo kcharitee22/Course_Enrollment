@@ -1,10 +1,14 @@
 import "dotenv/config.js";
 import express from "express";
 import cors from "cors";
-import authRouter from "./router/auth.route.js";
 import session from "express-session";
 import MongoStore from "connect-mongo";
-
+import authRouter from "./router/auth.route.js";
+import courseRouter from "./router/course.route.js";
+import lessonRouter from "./router/lesson.route.js";
+import moduleRouter from "./router/module.route.js";
+import enrollmentRouter from "./router/enrollment.route.js";
+import progressRouter from "./router/progress.route.js"
 const app = express();
 
 // Allow requests from our React frontend
@@ -43,5 +47,10 @@ app.use(
 app.use(express.json());
 
 app.use("/api/auth", authRouter);
+app.use("/api/courses",courseRouter);
+app.use("/api/modules",moduleRouter);
+app.use("/api/lessons",lessonRouter);
+app.use("/api/enrollments",enrollmentRouter);
+app.use("/api/progress", progressRouter);
 
 export default app;
